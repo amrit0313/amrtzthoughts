@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEST_PUBLIC_API_URL || 'amrtz-thoughts-backend.vercel.app',
+  baseURL: process.env.NEST_PUBLIC_API_URL,
   withCredentials: true,
 });
 

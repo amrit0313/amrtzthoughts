@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/Button';
 
 export function OAuthButtons() {
   const handleGoogle = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/google`;
+    window.location.href = `${process.env.NEST_PUBLIC_API_URL}/auth/google`;
   };
 
   const handleFacebook = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/facebook`;
+    window.location.href = `${process.env.NEST_PUBLIC_API_URL}/auth/facebook`;
   };
 
   return (
