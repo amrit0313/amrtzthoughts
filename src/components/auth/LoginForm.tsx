@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useRouter } from 'next/navigation';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { useAuthStore } from '@/store/auth.store';
-import api from '@/lib/api';
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { useAuthStore } from "@/store/auth.store";
+import api from "@/lib/api";
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(1, "Password is required"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -20,8 +20,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
-  const [error, setError] = React.useState('');
-  
+  const [error, setError] = React.useState("");
+
   const {
     register,
     handleSubmit,
@@ -32,13 +32,13 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      setError('');
-      const response = await api.post('/auth/login', data);
+      setError("");
+      const response = await api.post("/auth/login", data);
       const { user, access_token } = response.data;
       setAuth(user, access_token);
-      router.push('/feed');
+      router.push("/feed");
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid email or password');
+      setError(err.response?.data?.message || "Invalid email or password");
     }
   };
 
@@ -55,14 +55,14 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           error={errors.email?.message}
-          {...register('email')}
+          {...register("email")}
         />
         <Input
           label="Password"
           type="password"
           autoComplete="current-password"
           error={errors.password?.message}
-          {...register('password')}
+          {...register("password")}
         />
       </div>
       <Button type="submit" className="w-full" loading={isSubmitting}>
