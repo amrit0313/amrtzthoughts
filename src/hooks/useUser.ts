@@ -53,7 +53,7 @@ export function useUpdateProfile() {
         formData.append("file", file);
       }
 
-      const { data } = await api.patch<User>(`/users/${userId}`, formData);
+      const { data } = await api.patch<User>(`/users/profile`, formData);
       return data;
     },
     onSuccess: (updatedUser) => {

@@ -9,10 +9,10 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { useUpdateProfile } from "@/hooks/useUser";
-import { User } from "@/types";
+import { User, Genre } from "@/types";
 
 const profileSchema = z.object({
-  genre: z.enum(["comedy", "other"]),
+  genre: z.nativeEnum(Genre),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -42,14 +42,14 @@ export function ProfileEditModal({
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      genre: user.genre || "other",
+      genre: user.genre || Genre.COMEDY,
     },
   });
 
   React.useEffect(() => {
     if (!isOpen) return;
 
-    reset({ genre: user.genre || "other" });
+    reset({ genre: user.genre || Genre.COMEDY });
     setSelectedFile(null);
     setPreviewUrl(null);
     setError("");
@@ -195,8 +195,14 @@ export function ProfileEditModal({
                 {...register("genre")}
                 className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm text-black transition-colors focus:border-black focus:outline-none"
               >
-                <option value="comedy">Comedy</option>
-                <option value="other">Other</option>
+                <option value={Genre.ROMANTIC}>Romantic</option>
+                <option value={Genre.THRILLER}>Thriller</option>
+                <option value={Genre.LITERATURE}>Literature</option>
+                <option value={Genre.COMEDY}>Comedy</option>
+                <option value={Genre.FANTASY}>Fantasy</option>
+                <option value={Genre.HUMOR}>Humor</option>
+                <option value={Genre.NEWS}>News</option>
+                <option value={Genre.INTROVERT}>Introvert</option>
               </select>
               {errors.genre && (
                 <p className="mt-2 text-sm text-red-500">

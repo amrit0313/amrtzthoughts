@@ -6,7 +6,16 @@ export interface User {
   genre: Genre;
 }
 
-export type Genre = 'comedy' | 'other'; // Extend as necessary
+export enum Genre {
+  ROMANTIC = "romantic",
+  THRILLER = "thriller",
+  LITERATURE = "literature",
+  COMEDY = "comedy",
+  FANTASY = "fantasy",
+  HUMOR = "humor",
+  NEWS = "news",
+  INTROVERT = "introvert",
+}
 
 export interface Thought {
   id: number;
@@ -32,7 +41,12 @@ export interface ThoughtShare {
   createdAt: string;
 }
 
-export type FriendshipStatus = 'pending' | 'accepted' | 'declined' | 'blocked' | 'unfriended';
+export type FriendshipStatus =
+  | "pending"
+  | "accepted"
+  | "declined"
+  | "blocked"
+  | "unfriended";
 
 export interface Friendship {
   id: number;
