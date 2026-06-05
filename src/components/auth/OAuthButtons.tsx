@@ -2,14 +2,15 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/Button";
+import { getApiBaseUrl } from "@/lib/api";
 
 export function OAuthButtons() {
   const handleGoogle = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+    window.location.href = `${getApiBaseUrl()}/auth/google`;
   };
 
   const handleFacebook = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/facebook`;
+    window.location.href = `${getApiBaseUrl()}/auth/facebook`;
   };
 
   return (

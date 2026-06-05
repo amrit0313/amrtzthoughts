@@ -1,7 +1,21 @@
 import axios from "axios";
 
+export function getApiBaseUrl() {
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const trimmedUrl = rawUrl.trim().replace(/\/+$/, "");
+
+  if (/^https?:\/\//i.test(trimmedUrl)) {
+    return trimmedUrl;
+  }
+
+  return trimmedUrl.startsWith("localhost") ||
+    trimmedUrl.startsWith("127.0.0.1")
+    ? `http://${trimmedUrl}`
+    : `https://${trimmedUrl}`;
+}
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: getApiBaseUrl(),
   withCredentials: true,
 });
 
