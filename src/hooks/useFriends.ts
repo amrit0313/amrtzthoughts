@@ -9,7 +9,7 @@ export type FriendshipActionResponse = {
 };
 
 export function useFriends() {
-  return useQuery({
+  return useQuery<Friendship[]>({
     queryKey: ["friends"],
     queryFn: async () => {
       const { data } = await api.get<Friendship[]>("/friendship");
@@ -19,7 +19,7 @@ export function useFriends() {
 }
 
 export function usePendingRequests() {
-  return useQuery({
+  return useQuery<Friendship[]>({
     queryKey: ["friends", "pending"],
     queryFn: async () => {
       const { data } = await api.get<Friendship[]>("/friendship");

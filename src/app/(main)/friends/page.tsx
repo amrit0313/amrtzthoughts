@@ -12,7 +12,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
-import { User } from "@/types";
+import { Friendship, User } from "@/types";
 
 function UserCard({ user, action }: { user: User; action?: React.ReactNode }) {
   return (
@@ -47,15 +47,17 @@ export default function FriendsPage() {
 
   const pendingRequests = React.useMemo(
     () =>
-      friendships?.filter((friendship) => friendship?.status === "pending") ??
-      [],
+      friendships?.filter(
+        (friendship: Friendship) => friendship.status === "pending",
+      ) ?? [],
     [friendships],
   );
 
   const acceptedFriends = React.useMemo(
     () =>
-      friendships?.filter((friendship) => friendship?.status === "accepted") ??
-      [],
+      friendships?.filter(
+        (friendship: Friendship) => friendship.status === "accepted",
+      ) ?? [],
     [friendships],
   );
 
@@ -113,15 +115,15 @@ export default function FriendsPage() {
             </p>
           ) : (
             <div className="flex flex-col border border-border rounded-lg overflow-hidden">
-              {pendingRequests.map((request) => {
+              {pendingRequests.map((request: Friendship) => {
                 const requester =
-                  request?.sender.id === currentUser?.id
-                    ? request?.receiver
-                    : request?.sender;
-                const isOutgoingRequest = request?.sender.id === currentUser?.id;
+                  request.sender.id === currentUser?.id
+                    ? request.receiver
+                    : request.sender;
+                const isOutgoingRequest = request.sender.id === currentUser?.id;
                 return (
                   <UserCard
-                    key={request?.id}
+                    key={request.id}
                     user={requester}
                     action={
                       <div className="flex gap-2">
@@ -130,7 +132,7 @@ export default function FriendsPage() {
                             size="sm"
                             variant="outline"
                             onClick={() =>
-                              cancelRequest(request?.id, {
+                              cancelRequest(request.id, {
                                 onSuccess: (data) => showSuccess(data.action),
                                 onError: (error) =>
                                   setFeedback({
@@ -147,7 +149,7 @@ export default function FriendsPage() {
                             <Button
                               size="sm"
                               onClick={() =>
-                                acceptRequest(request?.id, {
+                                acceptRequest(request.id, {
                                   onSuccess: (data) => showSuccess(data.action),
                                   onError: (error) =>
                                     setFeedback({
@@ -198,21 +200,21 @@ export default function FriendsPage() {
             </p>
           ) : (
             <div className="flex flex-col border border-border rounded-lg overflow-hidden">
-              {acceptedFriends.map((friendship) => {
+              {acceptedFriends.map((friendship: Friendship) => {
                 const friend =
-                  friendship?.sender.id === currentUser?.id
-                    ? friendship?.receiver
-                    : friendship?.sender;
+                  friendship.sender.id === currentUser?.id
+                    ? friendship.receiver
+                    : friendship.sender;
                 return (
                   <UserCard
-                    key={friendship?.id}
+                    key={friendship.id}
                     user={friend}
                     action={
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() =>
-                          unfriend(friendship?.id, {
+                          unfriend(friendship.id, {
                             onSuccess: (data) => showSuccess(data.action),
                             onError: (error) =>
                               setFeedback({
