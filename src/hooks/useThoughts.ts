@@ -24,6 +24,7 @@ export function useUserThoughts(userId: number | undefined) {
       if (!userId) return [];
       try {
         const { data } = await api.get<Thought[]>(`/thoughts/user/${userId}`);
+        console.log((data))
         return data;
       } catch (err: any) {
         if (err.response?.status === 404) return [];

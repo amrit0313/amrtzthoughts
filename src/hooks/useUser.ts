@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { Genre, User } from "@/types";
+import { Genre, User, UserWithFriendship } from "@/types";
 import { useAuthStore } from "@/store/auth.store";
 
 export function useUser(id: number) {
   return useQuery({
     queryKey: ["user", id],
     queryFn: async () => {
-      const { data } = await api.get<User>(`/users/${id}`);
+      const { data } = await api.get<UserWithFriendship>(`/users/${id}`);
       return data;
     },
     enabled: !!id,
@@ -43,16 +43,17 @@ type UpdateProfileInput = {
 
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ userId, genre, file }: UpdateProfileInput) => {
+      console.log(genre, file);
       const formData = new FormData();
-      formData.append("genre", genre);
+      formData.append("genre", genre ?? "");
 
       if (file) {
-        formData.append("file", file);
+        formData.append("profilePic", file);
       }
 
+      console.log(formData);
       const { data } = await api.patch<User>(`/users/profile`, formData);
       return data;
     },

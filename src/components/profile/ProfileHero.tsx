@@ -80,23 +80,20 @@ export function ProfileHero({
 
         <div className="flex flex-col gap-3 sm:items-end">
           {secondaryAction}
-          <Button
+         {isOwnProfile &&  <Button
             type="button"
             variant={isOwnProfile ? "primary" : "outline"}
             onClick={onEditProfile}
             className="rounded-full px-5"
           >
-            {isOwnProfile ? (
+           
               <PencilLine className="mr-2 h-4 w-4" />
-            ) : (
-              <UserRoundPlus className="mr-2 h-4 w-4" />
-            )}
             {actionLabel}
-          </Button>
+          </Button>}
           <p className="max-w-xs text-xs leading-5 text-muted-foreground">
             {isOwnProfile
               ? "Changes sync across your avatar, sidebar, and thought cards."
-              : "This button is ready for a friend request flow when the backend is wired."}
+              : "Make friends and make sure you are with   the ones like you."}
           </p>
         </div>
       </div>

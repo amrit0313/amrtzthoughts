@@ -57,6 +57,11 @@ export interface Friendship {
   updatedAt: string;
 }
 
+export interface UserWithFriendship {
+  user: User;
+  friendship: Friendship | null;
+}
+
 export interface AuthResponse {
   user: User;
   access_token: string;

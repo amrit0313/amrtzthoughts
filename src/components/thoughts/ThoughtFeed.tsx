@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { Thought } from '@/types';
-import { ThoughtCard } from './ThoughtCard';
-import { Spinner } from '@/components/ui/Spinner';
+import * as React from "react";
+import { Thought } from "@/types";
+import { ThoughtCard } from "./ThoughtCard";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface ThoughtFeedProps {
   thoughts?: Thought[];
@@ -9,10 +9,11 @@ interface ThoughtFeedProps {
   emptyMessage?: string;
 }
 
-export function ThoughtFeed({ 
-  thoughts = [], 
-  isLoading, 
-  emptyMessage = 'No thoughts yet.' 
+export function ThoughtFeed({
+  thoughts = [],
+
+  isLoading,
+  emptyMessage = "No thoughts yet.",
 }: ThoughtFeedProps) {
   if (isLoading) {
     return (
@@ -32,7 +33,7 @@ export function ThoughtFeed({
 
   return (
     <div className="flex flex-col">
-      {thoughts.map((thought) => (
+      {thoughts?.map((thought) => (
         <ThoughtCard key={thought.id} thought={thought} />
       ))}
     </div>

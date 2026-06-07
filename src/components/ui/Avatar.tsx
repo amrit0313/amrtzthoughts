@@ -1,31 +1,30 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   src?: string | null;
   alt?: string;
   initials?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
-  ({ className, src, alt = '', initials, size = 'md', ...props }, ref) => {
-    
+  ({ className, src, alt = "", initials, size = "md", ...props }, ref) => {
     const sizes = {
-      sm: 'h-8 w-8 text-xs',
-      md: 'h-10 w-10 text-sm',
-      lg: 'h-14 w-14 text-base',
-      xl: 'h-20 w-20 text-xl',
+      sm: "h-8 w-8 text-xs",
+      md: "h-10 w-10 text-sm",
+      lg: "h-14 w-14 text-base",
+      xl: "h-20 w-20 text-xl",
     };
 
     return (
       <div
         ref={ref}
         className={cn(
-          'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-black text-white',
+          "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-black text-white",
           sizes[size],
-          className
+          className,
         )}
         {...props}
       >
@@ -39,13 +38,13 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
           />
         ) : (
           <span className="font-medium uppercase tracking-wider">
-            {initials || '?'}
+            {initials || "?"}
           </span>
         )}
       </div>
     );
-  }
+  },
 );
-Avatar.displayName = 'Avatar';
+Avatar.displayName = "Avatar";
 
 export { Avatar };
