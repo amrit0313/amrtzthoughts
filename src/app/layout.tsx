@@ -4,6 +4,7 @@ import { Playfair_Display, DM_Sans } from 'next/font/google';
 import { Providers } from '@/components/Providers';
 import './globals.css';
 
+
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
   variable: '--font-playfair',
@@ -19,6 +20,15 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: 'Thoughts. | A minimalist space for your thoughts',
   description: 'Share what matters, without the noise.',
+  manifest: '/manifest.json',
+  icons: {
+    icon: { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+  },
+  other: {
+    'theme-color': '#FFFFFF',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+  },
 };
 
 export default function RootLayout({
