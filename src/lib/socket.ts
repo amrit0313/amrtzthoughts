@@ -56,6 +56,10 @@ export const connectSocket = (token: string): Socket => {
   socket.on("disconnect", (reason) =>
     console.log("socket disconnected", reason),
   );
+  // Catch-all: log EVERY event from the backend so we know exact event names
+  socket.onAny((event, ...args) => {
+    console.log("[socket] event:", event, args);
+  });
 
   return socket;
 };
