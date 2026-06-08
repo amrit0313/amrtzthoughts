@@ -3,14 +3,15 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, User, Users, Globe } from 'lucide-react';
+import { Home, User, Users, Globe, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const navItems = [
+export const navItems = [
   { href: '/feed', label: 'Feed', icon: Home },
   { href: '/users', label: 'Explore Users', icon: Globe },
   { href: '/profile', label: 'Profile', icon: User },
   { href: '/friends', label: 'Friends', icon: Users },
+  { href: '/messages', label: 'Messages', icon: MessageSquare },
 ];
 
 export function Sidebar() {

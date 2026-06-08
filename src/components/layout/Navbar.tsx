@@ -3,13 +3,17 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, User, Users, LogOut } from 'lucide-react';
+import { Home, User, Users, LogOut, MessageSquare, Menu, X } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { navItems } from './Sidebar';
+import { cn } from '@/lib/utils';
 
 export function Navbar() {
   const { user, logout } = useAuthStore();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const pathname = usePathname();
   
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#E5E5E5] bg-white/80 backdrop-blur-md">
@@ -20,7 +24,18 @@ export function Navbar() {
         
         <div className="flex items-center gap-4">
           {user && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="lg:hidden h-8 w-8 px-0"
+                onClick={() => setIsMobileMenuOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <Link href="/messages" className="hidden sm:flex text-gray-500 hover:text-black transition-colors h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100">
+                <MessageSquare className="h-5 w-5" />
+              </Link>
               <Link href="/profile" className="hidden sm:block">
                 <Avatar src={user.profilePic} initials={user.name?.[0] || user.email[0]} size="sm" />
               </Link>
@@ -32,6 +47,74 @@ export function Navbar() {
           )}
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div 
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <aside className="relative flex w-64 max-w-xs flex-1 flex-col bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-[#E5E5E5] px-4 py-4 h-16">
+              <span className="text-xl font-serif font-bold text-black tracking-tight">Thoughts.</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 px-0 rounded-full"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </Button>
+            </div>
+            
+            <nav className="flex-1 space-y-1 px-4 py-6 overflow-y-auto">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      "group flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors",
+                      isActive 
+                        ? "bg-[#F5F5F5] text-black" 
+                        : "text-gray-600 hover:bg-gray-50 hover:text-black"
+                    )}
+                  >
+                    <item.icon
+                      className={cn(
+                        "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
+                        isActive ? "text-black" : "text-gray-400 group-hover:text-black"
+                      )}
+                      aria-hidden="true"
+                    />
+                    {item.label}
+                  </Link>
+                );
+              })}
+              
+              <button
+                onClick={() => {
+                  logout();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="group flex w-full items-center px-4 py-3 text-sm font-medium rounded-md transition-colors text-red-600 hover:bg-red-50"
+              >
+                <LogOut className="mr-3 h-5 w-5 flex-shrink-0 text-red-500" aria-hidden="true" />
+                Sign out
+              </button>
+            </nav>
+            
+            <div className="px-4 mt-auto py-4">
+              <div className="rounded-md bg-[#F5F5F5] p-4 text-xs text-gray-500 text-center border border-[#E5E5E5]">
+                Thoughts. 2026
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
     </header>
   );
 }
