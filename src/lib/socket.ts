@@ -7,6 +7,8 @@ export const connectSocket = (token: string) => {
   if (socket) return socket;
   socket = io(getApiBaseUrl(), {
     auth: { token },
+      transports: ['websocket'],
+
   });
   return socket;
 };
