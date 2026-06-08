@@ -196,9 +196,9 @@ export function ChatWindow() {
         className="p-3 border-t border-border flex items-center gap-2 bg-white"
       >
         <Input
+          label="Type a message..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Type a message..."
           className="flex-1"
         />
         <Button type="submit" size="sm" className="px-3" disabled={!inputValue.trim()}>
