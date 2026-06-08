@@ -50,49 +50,33 @@ export function ChatWindow() {
     if (!socket || !activeChatFriend) return;
 
     const handleNewMessage = (message: Message) => {
-      if (
-        message.sender.id === activeChatFriend.id ||
-        message.receiver.id === activeChatFriend.id
-      ) {
+      // Only handle messages from the friend (not our own — those are handled by messageSent)
+      if (message.sender.id === activeChatFriend.id) {
         setMessages((prev) => {
           if (prev.some((m) => m.id === message.id)) return prev;
-
-          if (message.sender.id === currentUser?.id) {
-            const optimisticIndex = prev.findIndex(
-              (m) => m.content === message.content && m.id > 1000000000000
-            );
-            if (optimisticIndex !== -1) {
-              const newMessages = [...prev];
-              newMessages[optimisticIndex] = message;
-              return newMessages;
-            }
-          }
-
           return [...prev, message];
         });
-        if (message.sender.id === activeChatFriend.id) {
-          socket.emit("markSeen", { senderId: activeChatFriend.id });
-        }
+        socket.emit("markSeen", { senderId: activeChatFriend.id });
       }
     };
 
     const handleMessageSent = (message: Message) => {
-      if (message.receiver.id === activeChatFriend.id) {
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === message.id)) return prev;
+      // This fires for OUR sent messages — replace optimistic or add if missing
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === message.id)) return prev;
 
-          const optimisticIndex = prev.findIndex(
-            (m) => m.content === message.content && m.id > 1000000000000
-          );
-          if (optimisticIndex !== -1) {
-            const newMessages = [...prev];
-            newMessages[optimisticIndex] = message;
-            return newMessages;
-          }
+        // Replace optimistic placeholder (matched by content and temp id)
+        const optimisticIndex = prev.findIndex(
+          (m) => m.content === message.content && m.id > 1_000_000_000_000
+        );
+        if (optimisticIndex !== -1) {
+          const updated = [...prev];
+          updated[optimisticIndex] = message;
+          return updated;
+        }
 
-          return [...prev, message];
-        });
-      }
+        return [...prev, message];
+      });
     };
 
     const handleMessageDelivered = ({ messageId }: { messageId: number }) => {
@@ -133,20 +117,6 @@ export function ChatWindow() {
     if (!inputValue.trim() || !activeChatFriend || !currentUser) return;
 
     const content = inputValue.trim();
-    
-    // Optimistic UI update
-    const tempId = Date.now();
-    const optimisticMsg: Message = {
-      id: tempId,
-      sender: currentUser,
-      receiver: activeChatFriend,
-      content: content,
-      delivered: false,
-      seen: false,
-      createdAt: new Date().toISOString(),
-    };
-    
-    setMessages((prev) => [...prev, optimisticMsg]);
     setInputValue("");
 
     const socket = getSocket();
@@ -156,6 +126,19 @@ export function ChatWindow() {
         content: content,
       });
     }
+
+    // Optimistic UI: add immediately so sender sees their own message right away
+    const tempId = Date.now();
+    const optimisticMsg: Message = {
+      id: tempId,
+      sender: currentUser,
+      receiver: activeChatFriend,
+      content,
+      delivered: false,
+      seen: false,
+      createdAt: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, optimisticMsg]);
   };
 
   if (!activeChatFriend) return null;
