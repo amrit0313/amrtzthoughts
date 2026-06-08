@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
+import { connectSocket } from '@/lib/socket';
 import { Spinner } from '@/components/ui/Spinner';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -18,6 +19,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (isClient && !token) {
       router.replace('/login');
+    } else if (isClient && token) {
+      connectSocket(token);
     }
   }, [isClient, token, router, pathname]);
 

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { AuthGuard } from '@/components/auth/AuthGuard';
+import { ChatWindow } from '@/components/chat/ChatWindow';
 
 export default function MainLayout({
   children,
@@ -21,6 +22,7 @@ export default function MainLayout({
           </main>
         </div>
       </div>
+      <ChatWindow />
     </AuthGuard>
   );
 }

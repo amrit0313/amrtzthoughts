@@ -66,3 +66,13 @@ export interface AuthResponse {
   user: User;
   access_token: string;
 }
+
+export interface Message {
+  id: number;
+  sender: User;
+  receiver: User;
+  content: string;
+  delivered: boolean;
+  seen: boolean;
+  createdAt: string;
+}

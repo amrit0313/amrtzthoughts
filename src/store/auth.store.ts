@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/types";
+import { connectSocket, disconnectSocket } from "@/lib/socket";
 
 interface AuthState {
   user: User | null;
@@ -31,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
       setAuth: (user, token) => {
         localStorage.setItem("token", token);
         setTokenCookie(token);
+        connectSocket(token);
         set({ user, token });
       },
       updateUser: (user) => {
@@ -39,6 +41,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         localStorage.removeItem("token");
         clearTokenCookie();
+        disconnectSocket();
         set({ user: null, token: null });
       },
     }),

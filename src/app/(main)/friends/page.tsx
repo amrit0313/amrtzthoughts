@@ -13,6 +13,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { Friendship, User } from "@/types";
+import { useChatStore } from "@/store/chat.store";
 
 function UserCard({ user, action }: { user: User; action?: React.ReactNode }) {
   return (
@@ -33,6 +34,7 @@ function UserCard({ user, action }: { user: User; action?: React.ReactNode }) {
 
 export default function FriendsPage() {
   const currentUser = useAuthStore((state) => state.user);
+  const { setActiveChat } = useChatStore();
   const { data: friendships, isLoading: isFriendsLoading } = useFriends();
   console.log(friendships);
 
@@ -210,22 +212,30 @@ export default function FriendsPage() {
                     key={friendship.id}
                     user={friend}
                     action={
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() =>
-                          unfriend(friendship.id, {
-                            onSuccess: (data) => showSuccess(data.action),
-                            onError: (error) =>
-                              setFeedback({
-                                type: "error",
-                                message: getErrorMessage(error),
-                              }),
-                          })
-                        }
-                      >
-                        Unfriend
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => setActiveChat(friend)}
+                        >
+                          Message
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            unfriend(friendship.id, {
+                              onSuccess: (data) => showSuccess(data.action),
+                              onError: (error) =>
+                                setFeedback({
+                                  type: "error",
+                                  message: getErrorMessage(error),
+                                }),
+                            })
+                          }
+                        >
+                          Unfriend
+                        </Button>
+                      </div>
                     }
                   />
                 );
