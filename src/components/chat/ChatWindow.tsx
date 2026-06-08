@@ -112,17 +112,29 @@ export function ChatWindow() {
       });
     };
 
-    const handleMessageDelivered = ({ messageId }: { messageId: number }) => {
+    const handleMessageDelivered = (payload: Record<string, unknown>) => {
+      // Backend may send { messageId } or { id } — handle both
+      const messageId = (payload.messageId ?? payload.id) as number | string;
+      console.log("[socket] messageDelivered payload:", payload);
       setMessages((prev) =>
-        prev.map((m) => (m.id === messageId ? { ...m, delivered: true } : m))
+        // eslint-disable-next-line eqeqeq
+        prev.map((m) => (m.id == messageId ? { ...m, delivered: true } : m))
       );
     };
 
-    const handleMessagesSeen = ({ by }: { by: number }) => {
-      if (by === activeChatFriend.id) {
+    const handleMessagesSeen = (payload: Record<string, unknown>) => {
+      // Backend may send { by } as the reader's userId
+      const by = payload.by as number | string;
+      console.log("[socket] messagesSeen payload:", payload);
+      // eslint-disable-next-line eqeqeq
+      if (by == activeChatFriend.id) {
+        // Mark all messages WE sent to this friend as seen
         setMessages((prev) =>
           prev.map((m) =>
-            m.receiver.id === activeChatFriend.id ? { ...m, seen: true } : m
+            // eslint-disable-next-line eqeqeq
+            m.sender.id == currentUser?.id && m.receiver.id == activeChatFriend.id
+              ? { ...m, seen: true }
+              : m
           )
         );
       }
