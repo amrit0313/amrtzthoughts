@@ -3,13 +3,19 @@ import { getApiBaseUrl } from "./api";
 
 let socket: Socket | null = null;
 
-export const connectSocket = (token: string) => {
-  if (socket) return socket;
+export const connectSocket = (token: string): Socket => {
+  if (socket?.connected) return socket;
+
+  if (socket) {
+    (socket as Socket).disconnect();
+    socket = null;
+  }
+
   socket = io(getApiBaseUrl(), {
     auth: { token },
-      transports: ['websocket'],
-
+    transports: ["websocket"],
   });
+
   return socket;
 };
 
