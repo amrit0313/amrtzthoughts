@@ -74,7 +74,7 @@ export function ChatWindow() {
 
     const socket = getSocket();
     if (socket) {
-      socket.emit("markSeen", { senderId: activeChatFriend.id });
+      socket.emit("markseen", { senderId: activeChatFriend.id });
     }
   }, [activeChatFriend]);
 
@@ -89,12 +89,12 @@ export function ChatWindow() {
           if (prev.some((m) => m.id === message.id)) return prev;
           return [...prev, message];
         });
-        socket.emit("markSeen", { senderId: activeChatFriend.id });
+        socket.emit("markseen", { senderId: activeChatFriend.id });
       }
     };
 
     const handleMessageSent = (message: Message) => {
-      // This fires for OUR sent messages — replace optimistic or add if missing
+      // Backend event: 'message sent' — our confirmed sent message
       setMessages((prev) => {
         if (prev.some((m) => m.id === message.id)) return prev;
 
@@ -113,9 +113,8 @@ export function ChatWindow() {
     };
 
     const handleMessageDelivered = (payload: Record<string, unknown>) => {
-      // Backend may send { messageId } or { id } — handle both
+      // Backend emits 'message delivered' with { messageId }
       const messageId = (payload.messageId ?? payload.id) as number | string;
-      console.log("[socket] messageDelivered payload:", payload);
       setMessages((prev) =>
         // eslint-disable-next-line eqeqeq
         prev.map((m) => (m.id == messageId ? { ...m, delivered: true } : m))
@@ -123,12 +122,9 @@ export function ChatWindow() {
     };
 
     const handleMessagesSeen = (payload: Record<string, unknown>) => {
-      // Backend may send { by } as the reader's userId
       const by = payload.by as number | string;
-      console.log("[socket] messagesSeen payload:", payload);
       // eslint-disable-next-line eqeqeq
       if (by == activeChatFriend.id) {
-        // Mark all messages WE sent to this friend as seen
         setMessages((prev) =>
           prev.map((m) =>
             // eslint-disable-next-line eqeqeq
@@ -140,15 +136,30 @@ export function ChatWindow() {
       }
     };
 
+    // When the friend sends us a message while chat is open, they're clearly
+    // reading our conversation — mark our sent messages as seen
+    const markOurMessagesAsSeen = () => {
+      setMessages((prev) =>
+        prev.map((m) =>
+          // eslint-disable-next-line eqeqeq
+          m.sender.id == currentUser?.id && m.receiver.id == activeChatFriend.id
+            ? { ...m, seen: true }
+            : m
+        )
+      );
+    };
+
     socket.on("newMessage", handleNewMessage);
-    socket.on("messageSent", handleMessageSent);
-    socket.on("messageDelivered", handleMessageDelivered);
+    socket.on("newMessage", markOurMessagesAsSeen);
+    socket.on("message sent", handleMessageSent);
+    socket.on("message delivered", handleMessageDelivered);
     socket.on("messagesSeen", handleMessagesSeen);
 
     return () => {
       socket.off("newMessage", handleNewMessage);
-      socket.off("messageSent", handleMessageSent);
-      socket.off("messageDelivered", handleMessageDelivered);
+      socket.off("newMessage", markOurMessagesAsSeen);
+      socket.off("message sent", handleMessageSent);
+      socket.off("message delivered", handleMessageDelivered);
       socket.off("messagesSeen", handleMessagesSeen);
     };
   }, [activeChatFriend, currentUser]);
