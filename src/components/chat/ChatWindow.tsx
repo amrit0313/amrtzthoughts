@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Send } from "lucide-react";
+import { X, Send, ExternalLink } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useChatStore } from "@/store/chat.store";
 import { getSocket } from "@/lib/socket";
@@ -11,6 +11,39 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
+
+const URL_REGEX = /https?:\/\/[^\s]+/g;
+
+function MessageContent({ content, isMe }: { content: string; isMe: boolean }) {
+  const parts = content.split(URL_REGEX);
+  const urls = content.match(URL_REGEX) ?? [];
+
+  if (urls.length === 0) return <span>{content}</span>;
+
+  return (
+    <span>
+      {parts.map((part, i) => (
+        <React.Fragment key={i}>
+          {part}
+          {urls[i] && (
+            <a
+              href={urls[i]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-0.5 underline underline-offset-2 break-all ${
+                isMe ? "text-blue-200 hover:text-white" : "text-blue-600 hover:text-blue-800"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {urls[i]}
+              <ExternalLink className="inline h-3 w-3 flex-shrink-0" />
+            </a>
+          )}
+        </React.Fragment>
+      ))}
+    </span>
+  );
+}
 
 export function ChatWindow() {
   const currentUser = useAuthStore((state) => state.user);
@@ -144,7 +177,7 @@ export function ChatWindow() {
   if (!activeChatFriend) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-80 sm:w-96 rounded-lg shadow-2xl border border-border bg-white flex flex-col overflow-hidden h-[500px] max-h-[80vh]">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white sm:inset-auto sm:bottom-4 sm:right-4 sm:w-96 sm:rounded-lg sm:shadow-2xl sm:border sm:border-border sm:h-[500px] sm:max-h-[80vh]">
       <div className="flex items-center justify-between p-3 border-b border-border bg-mist/30">
         <div className="flex items-center gap-3">
           <Avatar
@@ -194,7 +227,7 @@ export function ChatWindow() {
                       : "bg-[#F5F5F5] text-black rounded-bl-sm"
                   }`}
                 >
-                  {msg.content}
+                  <MessageContent content={msg.content} isMe={isMe} />
                 </div>
                 {isMe && (
                   <span className="text-[10px] text-muted-foreground mt-1">
