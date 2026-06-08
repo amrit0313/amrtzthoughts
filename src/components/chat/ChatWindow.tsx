@@ -54,7 +54,22 @@ export function ChatWindow() {
         message.sender.id === activeChatFriend.id ||
         message.receiver.id === activeChatFriend.id
       ) {
-        setMessages((prev) => [...prev, message]);
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === message.id)) return prev;
+
+          if (message.sender.id === currentUser?.id) {
+            const optimisticIndex = prev.findIndex(
+              (m) => m.content === message.content && m.id > 1000000000000
+            );
+            if (optimisticIndex !== -1) {
+              const newMessages = [...prev];
+              newMessages[optimisticIndex] = message;
+              return newMessages;
+            }
+          }
+
+          return [...prev, message];
+        });
         if (message.sender.id === activeChatFriend.id) {
           socket.emit("markSeen", { senderId: activeChatFriend.id });
         }
@@ -63,13 +78,20 @@ export function ChatWindow() {
 
     const handleMessageSent = (message: Message) => {
       if (message.receiver.id === activeChatFriend.id) {
-        // Find optimistic message and update, or just append
-        // To keep it simple, we just append since we don't have optimistic IDs
-        // wait, the prompt says "confirmation sender's message was saved".
-        // Let's replace the last optimistic message or just append it.
-        // Actually, better to append when `messageSent` is received if we don't append optimistically.
-        // Or we can add optimistically and then update ID. Let's just append when received.
-        setMessages((prev) => [...prev, message]);
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === message.id)) return prev;
+
+          const optimisticIndex = prev.findIndex(
+            (m) => m.content === message.content && m.id > 1000000000000
+          );
+          if (optimisticIndex !== -1) {
+            const newMessages = [...prev];
+            newMessages[optimisticIndex] = message;
+            return newMessages;
+          }
+
+          return [...prev, message];
+        });
       }
     };
 
@@ -100,7 +122,7 @@ export function ChatWindow() {
       socket.off("messageDelivered", handleMessageDelivered);
       socket.off("messagesSeen", handleMessagesSeen);
     };
-  }, [activeChatFriend]);
+  }, [activeChatFriend, currentUser]);
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -108,15 +130,31 @@ export function ChatWindow() {
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim() || !activeChatFriend) return;
+    if (!inputValue.trim() || !activeChatFriend || !currentUser) return;
+
+    const content = inputValue.trim();
+    
+    // Optimistic UI update
+    const tempId = Date.now();
+    const optimisticMsg: Message = {
+      id: tempId,
+      sender: currentUser,
+      receiver: activeChatFriend,
+      content: content,
+      delivered: false,
+      seen: false,
+      createdAt: new Date().toISOString(),
+    };
+    
+    setMessages((prev) => [...prev, optimisticMsg]);
+    setInputValue("");
 
     const socket = getSocket();
     if (socket) {
       socket.emit("sendMessage", {
         receiverId: activeChatFriend.id,
-        content: inputValue.trim(),
+        content: content,
       });
-      setInputValue("");
     }
   };
 
